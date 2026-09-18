@@ -1,0 +1,27 @@
+name: Automated activity journal
+on:
+  schedule:
+    - cron: '23 6 * * *'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: automated-activity
+  cancel-in-progress: false
+jobs:
+  record:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: main
+      - name: Generate explicitly automated activity
+        env:
+          GIT_AUTHOR_NAME: Fs1lyric
+          GIT_AUTHOR_EMAIL: 279057232+Fs1lyric@users.noreply.github.com
+          GIT_COMMITTER_NAME: github-actions[bot]
+          GIT_COMMITTER_EMAIL: 41898282+github-actions[bot]@users.noreply.github.com
+        run: python3 scripts/activity.py
+      - name: Push journal entries
+        run: git push origin HEAD:main
